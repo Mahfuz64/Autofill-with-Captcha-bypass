@@ -1,5 +1,6 @@
-// Force single-thread WASM at top level to silence SIMD probe warnings
+// Fix: Tell ONNX Runtime where extension files are located in Manifest V3
 if (typeof ort !== "undefined") {
+    ort.env.wasm.wasmPaths = chrome.runtime.getURL("");
     ort.env.wasm.numThreads = 1;
     ort.env.wasm.simd = false;
     ort.env.wasm.proxy = false;
@@ -27,14 +28,15 @@ async function solveCaptcha(dataUrl) {
 
     // Load 1,571-character vocabulary dictionary
     if (!charsetMap) {
-        const res = await fetch("charset.json");
+        const res = await fetch(chrome.runtime.getURL("charset.json"));
         if (!res.ok) throw new Error("charset.json file missing in extension folder.");
         charsetMap = await res.json();
     }
 
     // Load ONNX model
     if (!onnxSession) {
-        const res = await fetch("captcha_model.onnx");
+        const modelUrl = chrome.runtime.getURL("captcha_model.onnx");
+        const res = await fetch(modelUrl);
         if (!res.ok) throw new Error("captcha_model.onnx file missing in extension folder.");
         const buffer = await res.arrayBuffer();
         onnxSession = await ort.InferenceSession.create(new Uint8Array(buffer), {
