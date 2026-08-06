@@ -29,3 +29,5 @@ This Chrome extension makes form filling faster and easier by storing common val
 ## License
 
 This project is free to use and modify.
+
+Mahfuz and Emon
