@@ -50,6 +50,10 @@ function findCaptchaOnPage() {
 
 function captureElementImage(imgEl) {
     try {
+        if (!imgEl || !imgEl.complete || imgEl.naturalWidth === 0) {
+            throw new Error("Image element not ready or zero dimensions.");
+        }
+
         const canvas = document.createElement("canvas");
         canvas.width = imgEl.naturalWidth || imgEl.width;
         canvas.height = imgEl.naturalHeight || imgEl.height;
@@ -58,10 +62,20 @@ function captureElementImage(imgEl) {
         ctx.drawImage(imgEl, 0, 0);
 
         const dataUrl = canvas.toDataURL("image/png");
+
+        if (!dataUrl || dataUrl === "data:," || dataUrl.length < 200) {
+            throw new Error("Canvas produced empty image data URL.");
+        }
+
         runOCR(dataUrl);
     } catch (e) {
+        console.warn("Direct element capture failed, falling back to screenshot crop:", e);
         const rect = imgEl.getBoundingClientRect();
-        cropImage(rect.left, rect.top, rect.width, rect.height);
+        if (rect.width > 0 && rect.height > 0) {
+            cropImage(rect.left, rect.top, rect.width, rect.height);
+        } else {
+            alert("Could not detect CAPTCHA image dimensions. Press Ctrl+Shift+X to select it manually.");
+        }
     }
 }
 
