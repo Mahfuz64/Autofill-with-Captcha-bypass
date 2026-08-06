@@ -337,52 +337,70 @@ if (downloadBtn) {
 
 const importFile = document.getElementById("importFile");
 if (importFile) {
-  importFile.addEventListener("change", function (event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      try {
-        const data = JSON.parse(e.target.result);
-        document.getElementById("profileName").value = file.name.replace(
-          ".json",
-          "",
-        );
+    importFile.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                document.getElementById("profileName").value = file.name.replace(".json", "");
 
-        appState.activeProfileName = null;
-        appState.isDirty = true;
-        document.getElementById("editorHeader").textContent =
-          "📂 Imported Profile *(Unsaved)*";
+                appState.activeProfileName = null;
+                appState.isDirty = true;
+                const header = document.getElementById("editorHeader");
+                if (header) header.textContent = "📂 Imported Profile *(Unsaved)*";
 
-        const form = document.getElementById("jsonForm");
-        for (const key in data) {
-          const field = form.querySelector(`[name="${key}"]`);
-          if (field) {
-            field.value = data[key];
-            field.dispatchEvent(new Event("change"));
-          }
-        }
-        setTimeout(() => {
-          const dynamicFields = [
-            "present_upazila",
-            "gra_subject",
-            "mas_subject",
-            "ssc_group",
-            "hsc_group",
-            "ssc_board",
-            "hsc_board",
-          ];
-          dynamicFields.forEach((f) => {
-            const field = form.querySelector(`[name="${f}"]`);
-            if (field && data[f]) field.value = data[f];
-          });
-        }, 150);
-      } catch (error) {
-        alert("Error reading JSON file.");
-      }
-    };
-    reader.readAsText(file);
-  });
+                // ⚡ FIX: Manually load the images into memory and UI
+                appState.currentPhoto = data.photo_base64 || "";
+                appState.currentSig = data.signature_base64 || "";
+
+                const pPreview = document.getElementById("photoPreview");
+                const sPreview = document.getElementById("sigPreview");
+                if (pPreview) {
+                    pPreview.src = appState.currentPhoto;
+                    pPreview.style.display = appState.currentPhoto ? "block" : "none";
+                }
+                if (sPreview) {
+                    sPreview.src = appState.currentSig;
+                    sPreview.style.display = appState.currentSig ? "block" : "none";
+                }
+
+                // Fill standard text boxes and dropdowns
+                const form = document.getElementById("jsonForm");
+                for (const key in data) {
+                    const field = form.querySelector(`[name="${key}"]`);
+                    if (field) {
+                        if (field.type === "checkbox") {
+                            field.checked = data[key] === "1";
+                        } else {
+                            field.value = data[key];
+                        }
+                        field.dispatchEvent(new Event("change"));
+                    }
+                }
+
+                // Fill dynamic dropdowns safely
+                setTimeout(() => {
+                    const dynamicFields = [
+                        "present_upazila", "gra_subject", "mas_subject", 
+                        "ssc_group", "hsc_group", "ssc_board", "hsc_board"
+                    ];
+                    dynamicFields.forEach((f) => {
+                        const field = form.querySelector(`[name="${f}"]`);
+                        if (field && data[f]) field.value = data[f];
+                    });
+                }, 150);
+                
+                // Reset the file input so you can import the same file again if needed
+                event.target.value = '';
+
+            } catch (error) {
+                alert("Error reading JSON file. Make sure it is a valid profile.");
+            }
+        };
+        reader.readAsText(file);
+    });
 }
 
 // CAPTCHA Only Button Listener
