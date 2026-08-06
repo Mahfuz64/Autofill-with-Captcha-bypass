@@ -1,0 +1,342 @@
+{
+  "S.S.C": [
+    {
+      "id": "3",
+      "name": "Business Studies"
+    },
+    {
+      "id": "4",
+      "name": "General"
+    },
+    {
+      "id": "2",
+      "name": "Humanities"
+    },
+    {
+      "id": "1",
+      "name": "Science"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "Dakhil": [
+    {
+      "id": "3",
+      "name": "Business Studies"
+    },
+    {
+      "id": "4",
+      "name": "General"
+    },
+    {
+      "id": "2",
+      "name": "Humanities"
+    },
+    {
+      "id": "1",
+      "name": "Science"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "S.S.C Vocational": [
+    {
+      "id": "11",
+      "name": "Agro-Based Food"
+    },
+    {
+      "id": "12",
+      "name": "Architectural Drafting with CAD"
+    },
+    {
+      "id": "13",
+      "name": "Automotive"
+    },
+    {
+      "id": "14",
+      "name": "Building Maintenance"
+    },
+    {
+      "id": "15",
+      "name": "Ceramic"
+    },
+    {
+      "id": "16",
+      "name": "Civil Construction"
+    },
+    {
+      "id": "17",
+      "name": "Civil Drafting with CAD"
+    },
+    {
+      "id": "18",
+      "name": "Computer and Information Technology"
+    },
+    {
+      "id": "19",
+      "name": "Dress Making"
+    },
+    {
+      "id": "20",
+      "name": "Dyeing, Printing and Finishing"
+    },
+    {
+      "id": "21",
+      "name": "Electrical Maintenance Works"
+    },
+    {
+      "id": "22",
+      "name": "Farm Machinery"
+    },
+    {
+      "id": "23",
+      "name": "Fish Culture and Breeding"
+    },
+    {
+      "id": "24",
+      "name": "Food Processing and Preservation"
+    },
+    {
+      "id": "25",
+      "name": "Fruit and Vegetable Cultivation"
+    },
+    {
+      "id": "26",
+      "name": "General Electrical Works"
+    },
+    {
+      "id": "27",
+      "name": "General Electronics"
+    },
+    {
+      "id": "28",
+      "name": "General Mechanics"
+    },
+    {
+      "id": "29",
+      "name": "Glass"
+    },
+    {
+      "id": "33",
+      "name": "Knitting"
+    },
+    {
+      "id": "30",
+      "name": "Livestock Rearing and Farming"
+    },
+    {
+      "id": "31",
+      "name": "Machine Tools Operation"
+    },
+    {
+      "id": "32",
+      "name": "Mechanical Drafting with CAD"
+    },
+    {
+      "id": "34",
+      "name": "Patient Care Technique"
+    },
+    {
+      "id": "35",
+      "name": "Plumbing and Pipe Fittings"
+    },
+    {
+      "id": "36",
+      "name": "Poultry Rearing and Farming"
+    },
+    {
+      "id": "37",
+      "name": "Refrigeration and Air Conditioning"
+    },
+    {
+      "id": "38",
+      "name": "Shrimp Culture and Breeding"
+    },
+    {
+      "id": "39",
+      "name": "Welding and Fabrication"
+    },
+    {
+      "id": "40",
+      "name": "Wood Working"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "O Level/Cambridge": [
+    {
+      "id": "3",
+      "name": "Business Studies"
+    },
+    {
+      "id": "4",
+      "name": "General"
+    },
+    {
+      "id": "2",
+      "name": "Humanities"
+    },
+    {
+      "id": "1",
+      "name": "Science"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "S.S.C Equivalent": [
+    {
+      "id": "3",
+      "name": "Business Studies"
+    },
+    {
+      "id": "4",
+      "name": "General"
+    },
+    {
+      "id": "2",
+      "name": "Humanities"
+    },
+    {
+      "id": "1",
+      "name": "Science"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "Dakhil Vocational": [
+    {
+      "id": "11",
+      "name": "Agro-Based Food"
+    },
+    {
+      "id": "12",
+      "name": "Architectural Drafting with CAD"
+    },
+    {
+      "id": "13",
+      "name": "Automotive"
+    },
+    {
+      "id": "14",
+      "name": "Building Maintenance"
+    },
+    {
+      "id": "15",
+      "name": "Ceramic"
+    },
+    {
+      "id": "16",
+      "name": "Civil Construction"
+    },
+    {
+      "id": "17",
+      "name": "Civil Drafting with CAD"
+    },
+    {
+      "id": "18",
+      "name": "Computer and Information Technology"
+    },
+    {
+      "id": "19",
+      "name": "Dress Making"
+    },
+    {
+      "id": "20",
+      "name": "Dyeing, Printing and Finishing"
+    },
+    {
+      "id": "21",
+      "name": "Electrical Maintenance Works"
+    },
+    {
+      "id": "22",
+      "name": "Farm Machinery"
+    },
+    {
+      "id": "23",
+      "name": "Fish Culture and Breeding"
+    },
+    {
+      "id": "24",
+      "name": "Food Processing and Preservation"
+    },
+    {
+      "id": "25",
+      "name": "Fruit and Vegetable Cultivation"
+    },
+    {
+      "id": "26",
+      "name": "General Electrical Works"
+    },
+    {
+      "id": "27",
+      "name": "General Electronics"
+    },
+    {
+      "id": "28",
+      "name": "General Mechanics"
+    },
+    {
+      "id": "29",
+      "name": "Glass"
+    },
+    {
+      "id": "33",
+      "name": "Knitting"
+    },
+    {
+      "id": "30",
+      "name": "Livestock Rearing and Farming"
+    },
+    {
+      "id": "31",
+      "name": "Machine Tools Operation"
+    },
+    {
+      "id": "32",
+      "name": "Mechanical Drafting with CAD"
+    },
+    {
+      "id": "34",
+      "name": "Patient Care Technique"
+    },
+    {
+      "id": "35",
+      "name": "Plumbing and Pipe Fittings"
+    },
+    {
+      "id": "36",
+      "name": "Poultry Rearing and Farming"
+    },
+    {
+      "id": "37",
+      "name": "Refrigeration and Air Conditioning"
+    },
+    {
+      "id": "38",
+      "name": "Shrimp Culture and Breeding"
+    },
+    {
+      "id": "39",
+      "name": "Welding and Fabrication"
+    },
+    {
+      "id": "40",
+      "name": "Wood Working"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ]
+}

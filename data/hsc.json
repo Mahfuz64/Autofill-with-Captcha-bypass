@@ -1,0 +1,410 @@
+{
+  "H.S.C": [
+    {
+      "id": "3",
+      "name": "Business Studies"
+    },
+    {
+      "id": "4",
+      "name": "General"
+    },
+    {
+      "id": "2",
+      "name": "Humanities"
+    },
+    {
+      "id": "1",
+      "name": "Science"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "Alim": [
+    {
+      "id": "3",
+      "name": "Business Studies"
+    },
+    {
+      "id": "4",
+      "name": "General"
+    },
+    {
+      "id": "2",
+      "name": "Humanities"
+    },
+    {
+      "id": "1",
+      "name": "Science"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "Business Management": [
+    {
+      "id": "3",
+      "name": "Business Studies"
+    },
+    {
+      "id": "4",
+      "name": "General"
+    },
+    {
+      "id": "2",
+      "name": "Humanities"
+    },
+    {
+      "id": "1",
+      "name": "Science"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "Diploma-in-Engineering": [
+    {
+      "id": "12",
+      "name": "Agriculture Technology"
+    },
+    {
+      "id": "13",
+      "name": "Architecture and Interior Design Technology"
+    },
+    {
+      "id": "15",
+      "name": "Automobile Technology"
+    },
+    {
+      "id": "48",
+      "name": "Ceramic Technology"
+    },
+    {
+      "id": "21",
+      "name": "Chemical Technology"
+    },
+    {
+      "id": "16",
+      "name": "Civil Technology"
+    },
+    {
+      "id": "20",
+      "name": "Computer Science & Engineering Technology"
+    },
+    {
+      "id": "17",
+      "name": "Computer Science Technology"
+    },
+    {
+      "id": "23",
+      "name": "Data Telecommunication and Network Technology"
+    },
+    {
+      "id": "24",
+      "name": "Electrical and Electronics Technology"
+    },
+    {
+      "id": "22",
+      "name": "Electrical Technology"
+    },
+    {
+      "id": "57",
+      "name": "Electro-Medical Technology"
+    },
+    {
+      "id": "42",
+      "name": "Electronics Technology"
+    },
+    {
+      "id": "27",
+      "name": "Environmental Technology"
+    },
+    {
+      "id": "46",
+      "name": "Firm Machinery"
+    },
+    {
+      "id": "85",
+      "name": "Food"
+    },
+    {
+      "id": "54",
+      "name": "Food Technology"
+    },
+    {
+      "id": "53",
+      "name": "Garments Design and Pattern Making"
+    },
+    {
+      "id": "45",
+      "name": "General Mechanics"
+    },
+    {
+      "id": "50",
+      "name": "Glass Technology"
+    },
+    {
+      "id": "49",
+      "name": "Graphic Design Technology"
+    },
+    {
+      "id": "18",
+      "name": "Information and Communication Technology"
+    },
+    {
+      "id": "31",
+      "name": "Instrumentation & Process Control Technology"
+    },
+    {
+      "id": "52",
+      "name": "Jute Technology"
+    },
+    {
+      "id": "43",
+      "name": "Library Science"
+    },
+    {
+      "id": "55",
+      "name": "Marine Technology"
+    },
+    {
+      "id": "32",
+      "name": "Mechanical Technology"
+    },
+    {
+      "id": "86",
+      "name": "Mechatronics"
+    },
+    {
+      "id": "34",
+      "name": "Mechatronics Technology"
+    },
+    {
+      "id": "56",
+      "name": "Mining & Mine Survey Technology"
+    },
+    {
+      "id": "36",
+      "name": "Power Technology"
+    },
+    {
+      "id": "37",
+      "name": "Printing Technology"
+    },
+    {
+      "id": "38",
+      "name": "Refrigeration & Air Conditioning Technology"
+    },
+    {
+      "id": "47",
+      "name": "Shipbuilding Technology"
+    },
+    {
+      "id": "44",
+      "name": "Survey"
+    },
+    {
+      "id": "41",
+      "name": "Telecommunication Technology"
+    },
+    {
+      "id": "51",
+      "name": "Textile Engineering"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "A Level/Sr. Cambridge": [
+    {
+      "id": "3",
+      "name": "Business Studies"
+    },
+    {
+      "id": "4",
+      "name": "General"
+    },
+    {
+      "id": "2",
+      "name": "Humanities"
+    },
+    {
+      "id": "1",
+      "name": "Science"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "H.S.C Equivalent": [
+    {
+      "id": "3",
+      "name": "Business Studies"
+    },
+    {
+      "id": "4",
+      "name": "General"
+    },
+    {
+      "id": "2",
+      "name": "Humanities"
+    },
+    {
+      "id": "1",
+      "name": "Science"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "Diploma in Medical Technology": [
+    {
+      "id": "93",
+      "name": "Dental"
+    },
+    {
+      "id": "92",
+      "name": "Laboratory"
+    },
+    {
+      "id": "96",
+      "name": "Pharmacy"
+    },
+    {
+      "id": "94",
+      "name": "Physiotherapy"
+    },
+    {
+      "id": "91",
+      "name": "Radiography"
+    },
+    {
+      "id": "95",
+      "name": "Radiotherapy"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "H.S.C Vocational": [
+    {
+      "id": "71",
+      "name": "Agro Machinery"
+    },
+    {
+      "id": "72",
+      "name": "Automobile"
+    },
+    {
+      "id": "73",
+      "name": "Building Construction and Maintenance"
+    },
+    {
+      "id": "74",
+      "name": "Clothing and Garments Finishing"
+    },
+    {
+      "id": "75",
+      "name": "Computer Operation and Maintenance"
+    },
+    {
+      "id": "76",
+      "name": "Drafting Civil"
+    },
+    {
+      "id": "77",
+      "name": "Electrical Works and Maintenance"
+    },
+    {
+      "id": "78",
+      "name": "Electronic Control and Communication"
+    },
+    {
+      "id": "79",
+      "name": "Fish Culture and Breeding"
+    },
+    {
+      "id": "84",
+      "name": "Industrial Wood Working"
+    },
+    {
+      "id": "80",
+      "name": "Machine Tools Operation and Maintenance"
+    },
+    {
+      "id": "81",
+      "name": "Poultry Rearing and Farming"
+    },
+    {
+      "id": "82",
+      "name": "Refrigeration and Air-conditioning"
+    },
+    {
+      "id": "83",
+      "name": "Welding and Fabrication"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "H.S.C (BM)": [
+    {
+      "id": "3",
+      "name": "Business Studies"
+    },
+    {
+      "id": "4",
+      "name": "General"
+    },
+    {
+      "id": "2",
+      "name": "Humanities"
+    },
+    {
+      "id": "1",
+      "name": "Science"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ],
+  "Diploma in Pharmacy": [
+    {
+      "id": "93",
+      "name": "Dental"
+    },
+    {
+      "id": "92",
+      "name": "Laboratory"
+    },
+    {
+      "id": "96",
+      "name": "Pharmacy"
+    },
+    {
+      "id": "94",
+      "name": "Physiotherapy"
+    },
+    {
+      "id": "91",
+      "name": "Radiography"
+    },
+    {
+      "id": "95",
+      "name": "Radiotherapy"
+    },
+    {
+      "id": "99",
+      "name": "Other"
+    }
+  ]
+}
