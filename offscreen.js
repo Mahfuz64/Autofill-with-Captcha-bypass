@@ -4,7 +4,7 @@ if (typeof ort !== "undefined") {
     ort.env.wasm.numThreads = 1;
     ort.env.wasm.simd = false;
     ort.env.wasm.proxy = false;
-    ort.env.logLevel = "error";
+    ort.env.logLevel = "fatal"; // Suppress WASM C++ warnings from fd_write (Ec)
 }
 
 let onnxSession = null;
@@ -38,7 +38,7 @@ async function solveCaptcha(dataUrl) {
         charsetMap = await res.json();
     }
 
-    // Load ONNX Model safely with graph optimization disabled
+    // Load ONNX Model safely with C++ warnings silenced
     if (!onnxSession) {
         const modelUrl = chrome.runtime.getURL("captcha_model.onnx");
         const res = await fetch(modelUrl);
@@ -47,7 +47,9 @@ async function solveCaptcha(dataUrl) {
 
         onnxSession = await ort.InferenceSession.create(new Uint8Array(buffer), {
             executionProviders: ["wasm"],
-            graphOptimizationLevel: "disabled" // Prevents WASM optimizer crashes in Chrome extensions
+            graphOptimizationLevel: "disabled",
+            logSeverityLevel: 4,  // 4 = Fatal only (silences [W:onnxruntime] C++ warnings in fd_write)
+            logVerbosityLevel: 4
         });
     }
 
@@ -109,9 +111,24 @@ function decodeCTC(data, dims, charset) {
     let steps = 0;
     let classes = 0;
 
+    // Support dynamic 3D output shapes e.g. {21, 1, 8210} or {1, 21, 8210}
     if (dims.length === 3) {
-        steps = (dims[0] === 1) ? dims[1] : dims[0];
-        classes = dims[2];
+        if (dims[0] === 1) {
+            steps = dims[1];
+            classes = dims[2];
+        } else if (dims[1] === 1) {
+            steps = dims[0];
+            classes = dims[2];
+        } else {
+            steps = dims[0];
+            classes = dims[2];
+        }
+    } else if (dims.length === 2) {
+        steps = dims[0];
+        classes = dims[1];
+    } else {
+        steps = dims[0];
+        classes = dims[dims.length - 1];
     }
 
     let resultStr = "";
