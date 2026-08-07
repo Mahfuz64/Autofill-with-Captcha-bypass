@@ -8,12 +8,16 @@
 
 <body>
   <div class="main-container">
-    
+
     <!-- TOP BAR -->
     <div class="top-header-bar">
       <span class="brand-title">BD Govt Job Autofill</span>
       <label class="btn-import-top">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
         Import JSON
         <input type="file" id="importFile" accept=".json" style="display: none;" />
       </label>
@@ -60,6 +64,14 @@
         <!-- DYNAMIC EDITOR HEADER -->
         <div class="editor-header-bar">
           <h3 id="editorHeader">Creating New Profile</h3>
+          <button type="button" id="openScanModalBtn" class="btn-xs btn-secondary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Scan Text
+          </button>
           <button type="button" id="startBlankBtn" class="btn-xs">Blank Profile</button>
         </div>
 
@@ -88,7 +100,7 @@
               <input type="text" name="mother" placeholder="Mother's Name" /></label>
             <label>মাতার নাম (বাংলায়)
               <input type="text" name="mother_bn" placeholder="বাংলায় মাতার নাম" /></label>
-            <label>Date of Birth 
+            <label>Date of Birth
               <input type="date" name="dob" /></label>
 
             <label>Nationality
@@ -196,8 +208,10 @@
               </select>
             </label>
 
-            <label class="full-width">Present Care Of <input type="text" name="present_careof" placeholder="Care Of Name" /></label>
-            <label class="full-width">Present Village/Road <input type="text" name="present_village" placeholder="Village / House / Road" /></label>
+            <label class="full-width">Present Care Of <input type="text" name="present_careof"
+                placeholder="Care Of Name" /></label>
+            <label class="full-width">Present Village/Road <input type="text" name="present_village"
+                placeholder="Village / House / Road" /></label>
 
             <label>Present District
               <select name="present_district">
@@ -534,7 +548,8 @@
                 <option value="112">Bandarban University</option>
                 <option value="121">Bangladesh Agricultural University,Mymensingh</option>
                 <option value="122">Bangladesh Airlines Training Centre (BATC)</option>
-                <option value="123">Bangladesh Army International University of Science &amp; Technology(BAIUST) ,Comilla</option>
+                <option value="123">Bangladesh Army International University of Science &amp; Technology(BAIUST)
+                  ,Comilla</option>
                 <option value="124">Bangladesh Army University of Engineering and Technology (BAUET), Qadirabad</option>
                 <option value="125">Bangladesh Army University of Science and Technology(BAUST), Saidpur</option>
                 <option value="126">Bangladesh Islami University</option>
@@ -860,7 +875,8 @@
                 <option value="112">Bandarban University</option>
                 <option value="121">Bangladesh Agricultural University,Mymensingh</option>
                 <option value="122">Bangladesh Airlines Training Centre (BATC)</option>
-                <option value="123">Bangladesh Army International University of Science &amp; Technology(BAIUST) ,Comilla</option>
+                <option value="123">Bangladesh Army International University of Science &amp; Technology(BAIUST)
+                  ,Comilla</option>
                 <option value="124">Bangladesh Army University of Engineering and Technology (BAUET), Qadirabad</option>
                 <option value="125">Bangladesh Army University of Science and Technology(BAUST), Saidpur</option>
                 <option value="126">Bangladesh Islami University</option>
@@ -1128,7 +1144,7 @@
             <input type="file" id="profilePhoto" accept="image/jpeg, image/png" />
           </label>
           <img id="photoPreview" />
-        
+
           <label class="full-width" style="margin-top: 8px;">Upload Signature (300px x 80px)
             <input type="file" id="profileSignature" accept="image/jpeg, image/png" />
           </label>
@@ -1143,8 +1159,38 @@
       </form>
     </div>
 
-    <script src="popup.js"></script>
+    <!-- 🤖 THEMED TELETALK PDF SCANNER MODAL -->
+    <div id="cvModalOverlay"
+      style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(3px);">
+      <div class="fill-card" style="width: 90%; max-width: 400px; padding: 20px; position: relative; margin: 0;">
+
+        <div class="editor-header-bar" style="margin-bottom: 12px; border-bottom: 2px solid var(--border-silver);">
+          <h3 style="font-size: 1.05rem;">Teletalk PDF Scanner (beta version)</h3>
+        </div>
+
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0; margin-bottom: 12px; line-height: 1.4;">
+          Open an old <strong>Applicant's Copy PDF</strong>, press <strong>Ctrl+A</strong> then <strong>Ctrl+C</strong>
+          to copy, and paste it below.
+        </p>
+
+        <textarea id="cvPasteBox" rows="8"
+          style="width: 100%; background: #ffffff; border: 1px solid var(--border-silver); color: var(--text-main); border-radius: var(--radius-md); padding: 0.55rem 0.75rem; font-family: inherit; font-size: 0.85rem; margin-bottom: 15px; outline: none; resize: vertical; transition: var(--transition);"
+          placeholder="Paste text here..."
+          onfocus="this.style.borderColor='var(--border-silver-strong)'; this.style.boxShadow='var(--shadow-glow)';"
+          onblur="this.style.borderColor='var(--border-silver)'; this.style.boxShadow='none';"></textarea>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button type="button" id="closeCvModalBtn" class="btn btn-secondary">Cancel</button>
+          <button type="button" id="executeScanBtn" class="btn btn-primary">🔍 Scan & Fill</button>
+        </div>
+
+      </div>
+
+      <script src="popup.js"></script>
+    </div>
+
   </div>
+
 </body>
 
 </html>

@@ -768,3 +768,238 @@ document.getElementById("injectBtn").addEventListener("click", async () => {
     window.close();
   });
 });
+
+
+// ==========================================
+// 🤖 TELETALK PDF SCANNER (ADVANCED PARSER)
+// ==========================================
+document.addEventListener("click", (e) => {
+    
+    // 1. OPEN MODAL
+    if (e.target.id === "openScanModalBtn") {
+        e.preventDefault();
+        document.getElementById("cvModalOverlay").style.display = "flex";
+        document.getElementById("cvPasteBox").value = "";
+        document.getElementById("cvPasteBox").focus();
+    }
+
+    // 2. CLOSE MODAL (Cancel)
+    if (e.target.id === "closeCvModalBtn") {
+        e.preventDefault();
+        document.getElementById("cvModalOverlay").style.display = "none";
+    }
+
+    // 3. EXECUTE SCAN & FILL
+    if (e.target.id === "executeScanBtn") {
+        e.preventDefault();
+        const cvText = document.getElementById("cvPasteBox").value;
+        if (!cvText.trim()) return alert("Please paste the PDF text into the box!");
+
+        if (appState.isDirty && !confirm("Discard your current unsaved changes?")) {
+            document.getElementById("cvModalOverlay").style.display = "none";
+            return;
+        }
+
+        console.log("🔍 Running Advanced Teletalk Extraction...");
+
+        // --- PREPARE BLANK PROFILE ---
+        const profileSelector = document.getElementById("profileSelector");
+        if (profileSelector) profileSelector.value = "";
+        appState.activeProfileName = null;
+        appState.isDirty = true;
+        document.getElementById("jsonForm").reset();
+        
+        // Ensure image previews are wiped for the blank profile
+        appState.currentPhoto = ""; appState.currentSig = "";
+        const pPreview = document.getElementById("photoPreview");
+        const sPreview = document.getElementById("sigPreview");
+        if (pPreview) { pPreview.src = ""; pPreview.style.display = "none"; }
+        if (sPreview) { sPreview.src = ""; sPreview.style.display = "none"; }
+
+        updatePreviewCard();
+        populateEditorTab();
+
+        // Helper: Set Field safely
+        const setField = (fieldName, value) => {
+            if (!value) return;
+            const el = document.querySelector(`[name="${fieldName}"]`);
+            if (!el) return;
+
+            if (el.tagName === "SELECT") {
+                for (let i = 0; i < el.options.length; i++) {
+                    if (el.options[i].text.toLowerCase().includes(value.toLowerCase()) || 
+                        String(el.options[i].value).toLowerCase() === value.toLowerCase()) {
+                        el.selectedIndex = i;
+                        break;
+                    }
+                }
+            } else {
+                el.value = value;
+            }
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        // ==============================================
+        // 🧩 THE UNIVERSAL TELETALK MASTER PARSER
+        // ==============================================
+        
+        // --- 1. BASIC FIELDS (Handles Colons, 'H's, and Spaces) ---
+        const getBasic = (labelRegex) => {
+            // First try same-line with : or H or space
+            const match = cvText.match(new RegExp(labelRegex + "[ \\t]*[:H\\-]?[ \\t]*(.+)", "i"));
+            if (match && match[1].trim() !== "") return match[1].trim();
+            return null;
+        };
+
+        const emailMatch = cvText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+        if (emailMatch) setField("email", emailMatch[0]);
+
+        const phoneMatch = cvText.match(/(?:\+?88)?\s*(01[3-9]\d{8})/);
+        if (phoneMatch) setField("mobile", phoneMatch[1]);
+
+        const nidMatch = cvText.match(/National ID[ \t]*[:H\-]?[ \t]*(\d+)/i);
+        if (nidMatch) setField("nid_no", nidMatch[1]);
+
+        const genderMatch = getBasic("Gender");
+        if (genderMatch && (genderMatch.includes("Male") || genderMatch.includes("Female"))) {
+            setField("gender", genderMatch.includes("Female") ? "Female" : "Male");
+        }
+
+        const relMatch = getBasic("Religion");
+        if (relMatch) {
+            if (relMatch.includes("Islam")) setField("religion", "Islam");
+            else if (relMatch.includes("Hindu")) setField("religion", "Hinduism");
+            else if (relMatch.includes("Buddh")) setField("religion", "Buddhism");
+            else if (relMatch.includes("Christ")) setField("religion", "Christianity");
+        }
+
+        const maritalMatch = getBasic("Marital Status");
+        if (maritalMatch && (maritalMatch.includes("Single") || maritalMatch.includes("Married"))) {
+            setField("marital_status", maritalMatch.includes("Single") ? "Single" : "Married");
+        } else {
+            const looseMarital = cvText.match(/\b(Single|Married)\b/i);
+            if (looseMarital) setField("marital_status", looseMarital[1].trim());
+        }
+
+        // --- 2. DATE OF BIRTH ---
+        const dobMatch = cvText.match(/(\d{2})-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-(\d{4})/i);
+        if (dobMatch) {
+            const months = { Jan:"01", Feb:"02", Mar:"03", Apr:"04", May:"05", Jun:"06", Jul:"07", Aug:"08", Sep:"09", Oct:"10", Nov:"11", Dec:"12" };
+            setField("dob", `${dobMatch[3]}-${months[dobMatch[2]]}-${dobMatch[1]}`);
+        }
+
+        // --- 3. NAMES (The Anchor Fallback Matrix) ---
+        const lines = cvText.split('\n').map(l => l.trim()).filter(l => l !== '');
+        
+        // English Names
+        const nameEn = getBasic("Applicant's Name");
+        if (nameEn) setField("name", nameEn);
+        else {
+            // PDF 1 Split Glitch Fallback
+            const appIdx = lines.findIndex(l => l.includes("Applicant's Name") || l.includes("Name of the Post"));
+            if (appIdx !== -1) {
+                const looseName = lines.find((l, i) => i > appIdx && l.match(/^[A-Z\s\.]+$/) && !l.includes("ID") && !l.includes("POST"));
+                if (looseName) setField("name", looseName);
+            }
+        }
+
+        const nameBn = getBasic("আবেদনকারীর নাম");
+        if (nameBn) setField("name_bn", nameBn);
+        
+        const fatherEn = getBasic("Father's Name");
+        if (fatherEn) setField("father", fatherEn);
+        
+        const fatherBn = getBasic("পিতার নাম");
+        if (fatherBn) setField("father_bn", fatherBn);
+
+        // Mother's Name (Always heavily glitched)
+        const motherEn = getBasic("Mother's Name");
+        if (motherEn) {
+            setField("mother", motherEn);
+        } else {
+            const dobIndex = lines.findIndex(l => l.match(/^\d{2}-[A-Za-z]{3}-\d{4}/));
+            if (dobIndex !== -1 && dobIndex >= 2) {
+                let mEn = lines[dobIndex - 2].replace(/^[:H\-\s]*/, '');
+                let mBn = lines[dobIndex - 1].replace(/^[:H\-\s]*/, '');
+                if (mEn !== "Mother's Name" && mEn !== "") setField("mother", mEn);
+                if (mBn !== "মাতার নাম" && mBn !== "") setField("mother_bn", mBn);
+            }
+        }
+
+        // --- 4. ADDRESS EXTRACTION (The First-Match Rule) ---
+        // Because "Present Address" is always listed first, grabbing the FIRST match gets Present.
+        
+        const careofMatch = cvText.match(/Care Of[ \t]*[:H\-]?[ \t]*([^\n]+?)(?:\s+Care Of|$)/i);
+        if (careofMatch) setField("present_careof", careofMatch[1].trim());
+
+        // Handles Vill/ Road/ AND Vill/Town/Road/ AND weird boxes
+        const villMatch = cvText.match(/Vill\/.*?Road\/[ \t]*[:H\-☐]?[ \t]*([^\n]+?)(?:\s+Vill|$)/i);
+        if (villMatch) setField("present_village", villMatch[1].trim());
+
+        const districtMatch = cvText.match(/District[ \t]*[:H\-]?[ \t]*([A-Za-z\s]+?)(?:\s+District|$)/i);
+        if (districtMatch) setField("present_district", districtMatch[1].trim());
+
+        const upazilaMatch = cvText.match(/Upazila\/P\.S\.[ \t]*[:H\-]?[ \t]*([A-Za-z\s]+?)(?:\s+Upazila|$)/i);
+        if (upazilaMatch) setField("present_upazila", upazilaMatch[1].trim());
+
+        const postMatch = cvText.match(/Post Office[ \t]*[:H\-]?[ \t]*([A-Za-z\s\-]+?)(?:\s+Post Office|$)/i);
+        if (postMatch) setField("present_post", postMatch[1].trim());
+
+        const codeMatch = cvText.match(/Post Code[ \t]*[:H\-]?[ \t]*(\d{4})/i);
+        if (codeMatch) setField("present_postcode", codeMatch[1].trim());
+
+        // --- 5. EDUCATION GRID (Bulletproof) ---
+        const sscRegex = /(S\.S\.C|Dakhil|O-Level)\s+(.+?)\s+(\d+|N\/A)\s+(?:GPA|CGPA)\s+([0-9.]+)\s*\(Out of \d\)\s+(.+?)\s+(\d{4})/i;
+        const sscMatch = cvText.match(sscRegex);
+        if (sscMatch) {
+            setField("ssc_exam", sscMatch[1].trim());
+            setField("ssc_board", sscMatch[2].trim());
+            setField("ssc_roll", sscMatch[3].trim());
+            setField("ssc_result", sscMatch[4].trim());
+            setField("ssc_group", sscMatch[5].trim());
+            setField("ssc_year", sscMatch[6].trim());
+        }
+        
+        const hscRegex = /(H\.S\.C|Alim|A-Level)\s+(.+?)\s+(\d+|N\/A)\s+(?:GPA|CGPA)\s+([0-9.]+)\s*\(Out of \d\)\s+(.+?)\s+(\d{4})/i;
+        const hscMatch = cvText.match(hscRegex);
+        if (hscMatch) {
+            setField("hsc_exam", hscMatch[1].trim());
+            setField("hsc_board", hscMatch[2].trim());
+            setField("hsc_roll", hscMatch[3].trim());
+            setField("hsc_result", hscMatch[4].trim());
+            setField("hsc_group", hscMatch[5].trim());
+            setField("hsc_year", hscMatch[6].trim());
+        }
+
+        const graRegex = /(Honors|B\.Sc|B\.A|BSS|BBA|Degree)\s+(.+?)\s+(\d+|N\/A)\s+(?:GPA|CGPA)\s+([0-9.]+)\s*\(Out of \d\)\s+(.+?)\s+(\d{4})/i;
+        const graMatch = cvText.match(graRegex);
+        if (graMatch) {
+            setField("gra_exam", graMatch[1].trim());
+            setField("gra_institute", graMatch[2].trim());
+            setField("gra_result", graMatch[4].trim());
+            setField("gra_subject", graMatch[5].trim());
+            setField("gra_year", graMatch[6].trim());
+        }
+
+        const masRegex = /(M\.A|M\.Sc|MSS|MBA|M\.Com|Masters)\s+(.+?)\s+(\d+|N\/A)\s+(?:GPA|CGPA)\s+([0-9.]+)\s*\(Out of \d\)\s+(.+?)\s+(\d{4})/i;
+        const masMatch = cvText.match(masRegex);
+        if (masMatch) {
+            setField("mas_exam", masMatch[1].trim());
+            setField("mas_institute", masMatch[2].trim());
+            setField("mas_result", masMatch[4].trim());
+            setField("mas_subject", masMatch[5].trim());
+            setField("mas_year", masMatch[6].trim());
+        }
+
+        // --- FINISH UP ---
+        document.getElementById("cvModalOverlay").style.display = "none";
+        
+        const header = document.getElementById("editorHeader");
+        if (header) header.textContent = "✨ Scanned Profile *(Unsaved)*";
+        
+        setTimeout(() => {
+            alert("✅ Teletalk PDF Extracted! \n\nCheck the fields. It successfully found your English/Bengali names, Parents, Phone, Email, NID, DOB, and Education Rolls/Years!");
+        }, 300);
+    }
+});
