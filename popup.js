@@ -947,49 +947,64 @@ document.addEventListener("click", (e) => {
         const codeMatch = cvText.match(/Post Code[ \t]*[:H\-]?[ \t]*(\d{4})/i);
         if (codeMatch) setField("present_postcode", codeMatch[1].trim());
 
-        // --- 5. EDUCATION GRID (Bulletproof) ---
-        const sscRegex = /(S\.S\.C|Dakhil|O-Level)\s+(.+?)\s+(\d+|N\/A)\s+(?:GPA|CGPA)\s+([0-9.]+)\s*\(Out of \d\)\s+(.+?)\s+(\d{4})/i;
-        const sscMatch = cvText.match(sscRegex);
-        if (sscMatch) {
-            setField("ssc_exam", sscMatch[1].trim());
-            setField("ssc_board", sscMatch[2].trim());
-            setField("ssc_roll", sscMatch[3].trim());
-            setField("ssc_result", sscMatch[4].trim());
-            setField("ssc_group", sscMatch[5].trim());
-            setField("ssc_year", sscMatch[6].trim());
+        // --- 5. EDUCATION GRID (Newline-Proof & Scramble-Proof) ---
+        // 1. Flatten the entire text to destroy any line-breaks inside long University/Subject names!
+        let eduText = cvText.replace(/\n/g, ' ').replace(/\s+/g, ' ');
+
+        // 2. The Smart Extractor Engine
+        const extractEdu = (examKeywords) => {
+            // Pattern A: Standard Layout (Handles long line-broken names perfectly)
+            const regNormal = new RegExp(`(${examKeywords})\\s+(.+?)\\s+(\\d+|N\\/A)\\s+(?:GPA|CGPA)\\s+([0-9.]+)\\s*(?:\\(Out of.*?\\d\\))?\\s+(.+?)\\s+(\\d{4})`, "i");
+            let m = eduText.match(regNormal);
+            if (m) return { exam: m[1], inst: m[2], roll: m[3], result: m[4], sub: m[5], year: m[6] };
+
+            // Pattern B: Severe PDF Scramble (Handles when GPA wraps BEFORE the Exam Name!)
+            const regScramble = new RegExp(`(?:GPA|CGPA)\\s+([0-9.]+).*?(${examKeywords})\\s+(.+?)\\s+(\\d+|N\\/A)\\s+(.+?)\\s+(\\d{4})`, "i");
+            m = eduText.match(regScramble);
+            if (m) return { exam: m[2], inst: m[3], roll: m[4], result: m[1], sub: m[5], year: m[6] };
+
+            return null;
+        };
+
+        // 3. Execute and Fill Fields
+        const ssc = extractEdu("S\\.S\\.C|Dakhil|O-Level");
+        if (ssc) {
+            setField("ssc_exam", ssc.exam.trim());
+            setField("ssc_board", ssc.inst.trim());
+            setField("ssc_roll", ssc.roll.trim());
+            setField("ssc_result", ssc.result.trim());
+            setField("ssc_group", ssc.sub.trim());
+            setField("ssc_year", ssc.year.trim());
         }
         
-        const hscRegex = /(H\.S\.C|Alim|A-Level)\s+(.+?)\s+(\d+|N\/A)\s+(?:GPA|CGPA)\s+([0-9.]+)\s*\(Out of \d\)\s+(.+?)\s+(\d{4})/i;
-        const hscMatch = cvText.match(hscRegex);
-        if (hscMatch) {
-            setField("hsc_exam", hscMatch[1].trim());
-            setField("hsc_board", hscMatch[2].trim());
-            setField("hsc_roll", hscMatch[3].trim());
-            setField("hsc_result", hscMatch[4].trim());
-            setField("hsc_group", hscMatch[5].trim());
-            setField("hsc_year", hscMatch[6].trim());
+        const hsc = extractEdu("H\\.S\\.C|Alim|A-Level");
+        if (hsc) {
+            setField("hsc_exam", hsc.exam.trim());
+            setField("hsc_board", hsc.inst.trim());
+            setField("hsc_roll", hsc.roll.trim());
+            setField("hsc_result", hsc.result.trim());
+            setField("hsc_group", hsc.sub.trim());
+            setField("hsc_year", hsc.year.trim());
         }
 
-        const graRegex = /(Honors|B\.Sc|B\.A|BSS|BBA|Degree)\s+(.+?)\s+(\d+|N\/A)\s+(?:GPA|CGPA)\s+([0-9.]+)\s*\(Out of \d\)\s+(.+?)\s+(\d{4})/i;
-        const graMatch = cvText.match(graRegex);
-        if (graMatch) {
-            setField("gra_exam", graMatch[1].trim());
-            setField("gra_institute", graMatch[2].trim());
-            setField("gra_result", graMatch[4].trim());
-            setField("gra_subject", graMatch[5].trim());
-            setField("gra_year", graMatch[6].trim());
+        const gra = extractEdu("Honors|B\\.Sc|B\\.A|BSS|BBA|Degree");
+        if (gra) {
+            setField("gra_exam", gra.exam.trim());
+            setField("gra_institute", gra.inst.trim());
+            setField("gra_result", gra.result.trim());
+            setField("gra_subject", gra.sub.trim());
+            setField("gra_year", gra.year.trim());
         }
 
-        const masRegex = /(M\.A|M\.Sc|MSS|MBA|M\.Com|Masters)\s+(.+?)\s+(\d+|N\/A)\s+(?:GPA|CGPA)\s+([0-9.]+)\s*\(Out of \d\)\s+(.+?)\s+(\d{4})/i;
-        const masMatch = cvText.match(masRegex);
-        if (masMatch) {
-            setField("mas_exam", masMatch[1].trim());
-            setField("mas_institute", masMatch[2].trim());
-            setField("mas_result", masMatch[4].trim());
-            setField("mas_subject", masMatch[5].trim());
-            setField("mas_year", masMatch[6].trim());
+        const mas = extractEdu("M\\.A|M\\.Sc|MSS|MBA|M\\.Com|Masters");
+        if (mas) {
+            setField("mas_exam", mas.exam.trim());
+            setField("mas_institute", mas.inst.trim());
+            setField("mas_result", mas.result.trim());
+            setField("mas_subject", mas.sub.trim());
+            setField("mas_year", mas.year.trim());
         }
-
+        
         // --- FINISH UP ---
         document.getElementById("cvModalOverlay").style.display = "none";
         
