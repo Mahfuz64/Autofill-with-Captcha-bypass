@@ -844,87 +844,85 @@ document.addEventListener("click", (e) => {
         // 🧩 THE UNIVERSAL TELETALK MASTER PARSER
         // ==============================================
         
-        // --- 1. BASIC FIELDS (Handles Colons, 'H's, and Spaces) ---
-        const getBasic = (labelRegex) => {
-            // First try same-line with : or H or space
-            const match = cvText.match(new RegExp(labelRegex + "[ \\t]*[:H\\-]?[ \\t]*(.+)", "i"));
-            if (match && match[1].trim() !== "") return match[1].trim();
-            return null;
-        };
+        // ==============================================
+        // 🧩 THE ULTIMATE TELETALK PARSER (VALUE-BASED)
+        // ==============================================
 
+        // --- 1. GLOBAL UNIQUE VALUES (Email, Phone, NID, Dropdowns) ---
+        // Email (Hunts for the @ format)
         const emailMatch = cvText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
         if (emailMatch) setField("email", emailMatch[0]);
 
-        const phoneMatch = cvText.match(/(?:\+?88)?\s*(01[3-9]\d{8})/);
+        // Mobile (Hunts for 11 digits starting with 01)
+        const phoneMatch = cvText.match(/\b(01[3-9]\d{8})\b/);
         if (phoneMatch) setField("mobile", phoneMatch[1]);
 
-        const nidMatch = cvText.match(/National ID[ \t]*[:H\-]?[ \t]*(\d+)/i);
-        if (nidMatch) setField("nid_no", nidMatch[1]);
-
-        const genderMatch = getBasic("Gender");
-        if (genderMatch && (genderMatch.includes("Male") || genderMatch.includes("Female"))) {
-            setField("gender", genderMatch.includes("Female") ? "Female" : "Male");
-        }
-
-        const relMatch = getBasic("Religion");
-        if (relMatch) {
-            if (relMatch.includes("Islam")) setField("religion", "Islam");
-            else if (relMatch.includes("Hindu")) setField("religion", "Hinduism");
-            else if (relMatch.includes("Buddh")) setField("religion", "Buddhism");
-            else if (relMatch.includes("Christ")) setField("religion", "Christianity");
-        }
-
-        const maritalMatch = getBasic("Marital Status");
-        if (maritalMatch && (maritalMatch.includes("Single") || maritalMatch.includes("Married"))) {
-            setField("marital_status", maritalMatch.includes("Single") ? "Single" : "Married");
+        // NID (Tries label first, then hunts for a standalone 10, 13, or 17 digit number)
+        const nidRegexMatch = cvText.match(/National ID[ \t]*[:H\-]?[ \t]*(\d+)/i);
+        if (nidRegexMatch) {
+            setField("nid_no", nidRegexMatch[1]);
         } else {
-            const looseMarital = cvText.match(/\b(Single|Married)\b/i);
-            if (looseMarital) setField("marital_status", looseMarital[1].trim());
+            const looseNid = cvText.match(/\b(\d{10}|\d{13}|\d{17})\b/);
+            if (looseNid) setField("nid_no", looseNid[1]);
         }
 
-        // --- 2. DATE OF BIRTH ---
+        // Dropdowns (Hunts the entire document for these exact words)
+        const genderMatch = cvText.match(/\b(Male|Female)\b/i);
+        if (genderMatch) setField("gender", genderMatch[0]);
+
+        const relMatch = cvText.match(/\b(Islam|Hinduism|Buddhism|Christianity)\b/i);
+        if (relMatch) setField("religion", relMatch[0]);
+
+        const maritalMatch = cvText.match(/\b(Single|Married|Widowed)\b/i);
+        if (maritalMatch) setField("marital_status", maritalMatch[0]);
+
+        // Date of Birth
         const dobMatch = cvText.match(/(\d{2})-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-(\d{4})/i);
         if (dobMatch) {
             const months = { Jan:"01", Feb:"02", Mar:"03", Apr:"04", May:"05", Jun:"06", Jul:"07", Aug:"08", Sep:"09", Oct:"10", Nov:"11", Dec:"12" };
             setField("dob", `${dobMatch[3]}-${months[dobMatch[2]]}-${dobMatch[1]}`);
         }
 
-        // --- 3. NAMES (The Anchor Fallback Matrix) ---
-        const lines = cvText.split('\n').map(l => l.trim()).filter(l => l !== '');
-        
-        // English Names
-        const nameEn = getBasic("Applicant's Name");
-        if (nameEn) setField("name", nameEn);
-        else {
-            // PDF 1 Split Glitch Fallback
-            const appIdx = lines.findIndex(l => l.includes("Applicant's Name") || l.includes("Name of the Post"));
-            if (appIdx !== -1) {
-                const looseName = lines.find((l, i) => i > appIdx && l.match(/^[A-Z\s\.]+$/) && !l.includes("ID") && !l.includes("POST"));
-                if (looseName) setField("name", looseName);
+        // --- 2. NAMES (The "Filter & Stack" Anchor Method) ---
+        // Because columns get split, we destroy all labels so the raw names stack perfectly on top of the DOB.
+        let cleanedLines = [];
+        const labelsToStrip = [
+            /Applicant's Name/gi, /আবেদনকারীর নাম/g,
+            /Father's Name/gi, /পিতার নাম/g,
+            /Mother's Name/gi, /মাতার নাম/g,
+            /Date of Birth/gi, /Name of the Post/gi, /Basic Information/gi,
+            /User Id/gi, /User IР/gi, /Nationality/gi, /Religion/gi, /Gender/gi,
+            /National ID/gi, /Birth Registration/gi, /Passport ID/gi, /Marital Status/gi,
+            /Mobile Number/gi, /Email/gi, /Quota/gi, /Departmental Status/gi,
+            /Ref\. No\./gi
+        ];
+
+        for (let line of cvText.split('\n')) {
+            // 1. Strip out every known label from the line
+            for (let regex of labelsToStrip) {
+                line = line.replace(regex, "");
             }
+            // 2. Remove leading/trailing colons, hyphens, and whitespace
+            line = line.replace(/^[:\-\s]+|[:\-\s]+$/g, '').trim();
+
+            // 3. Ignore garbage leftover characters
+            if (line === "" || line === "H" || line === "B" || line === ":" || line === "N/A" || line.includes("Dated:")) {
+                continue;
+            }
+            cleanedLines.push(line); // Save the clean value!
         }
 
-        const nameBn = getBasic("আবেদনকারীর নাম");
-        if (nameBn) setField("name_bn", nameBn);
-        
-        const fatherEn = getBasic("Father's Name");
-        if (fatherEn) setField("father", fatherEn);
-        
-        const fatherBn = getBasic("পিতার নাম");
-        if (fatherBn) setField("father_bn", fatherBn);
+        // Find the exact line containing the DOB in our clean list
+        const dobIndex = cleanedLines.findIndex(l => l.match(/^\d{2}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-\d{4}/i));
 
-        // Mother's Name (Always heavily glitched)
-        const motherEn = getBasic("Mother's Name");
-        if (motherEn) {
-            setField("mother", motherEn);
-        } else {
-            const dobIndex = lines.findIndex(l => l.match(/^\d{2}-[A-Za-z]{3}-\d{4}/));
-            if (dobIndex !== -1 && dobIndex >= 2) {
-                let mEn = lines[dobIndex - 2].replace(/^[:H\-\s]*/, '');
-                let mBn = lines[dobIndex - 1].replace(/^[:H\-\s]*/, '');
-                if (mEn !== "Mother's Name" && mEn !== "") setField("mother", mEn);
-                if (mBn !== "মাতার নাম" && mBn !== "") setField("mother_bn", mBn);
-            }
+        // The 6 lines immediately above the DOB will ALWAYS be the names, no matter how the PDF split!
+        if (dobIndex >= 6) {
+            setField("name", cleanedLines[dobIndex - 6]);
+            setField("name_bn", cleanedLines[dobIndex - 5]);
+            setField("father", cleanedLines[dobIndex - 4]);
+            setField("father_bn", cleanedLines[dobIndex - 3]);
+            setField("mother", cleanedLines[dobIndex - 2]);
+            setField("mother_bn", cleanedLines[dobIndex - 1]);
         }
 
         // --- 4. ADDRESS EXTRACTION (The First-Match Rule) ---

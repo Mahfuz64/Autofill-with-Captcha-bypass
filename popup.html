@@ -65,11 +65,6 @@
         <div class="editor-header-bar">
           <h3 id="editorHeader">Creating New Profile</h3>
           <button type="button" id="openScanModalBtn" class="btn-xs btn-secondary">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
             Scan Text
           </button>
           <button type="button" id="startBlankBtn" class="btn-xs">Blank Profile</button>
@@ -159,7 +154,7 @@
               <select name="breg">
                 <option value="">-- Select --</option>
                 <option value="1">Yes</option>
-                <option value="0">No</option>
+                <option value="0" selected>No</option>
               </select>
             </label>
             <label>Birth Reg Number <input type="text" name="breg_no" placeholder="17 digit Birth Reg No." /></label>
@@ -168,7 +163,7 @@
               <select name="passport">
                 <option value="">-- Select --</option>
                 <option value="1">Yes</option>
-                <option value="0">No</option>
+                <option value="0" selected>No</option>
               </select>
             </label>
             <label>Passport Number <input type="text" name="passport_no" placeholder="Passport Number" /></label>
