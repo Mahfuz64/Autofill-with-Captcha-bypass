@@ -256,65 +256,77 @@ document.getElementById("profileSelector").addEventListener("change", function (
 });
 
 function populateEditorTab() {
-  const form = document.getElementById("jsonForm");
-  const header = document.getElementById("editorHeader");
-  const saveBtn = document.getElementById("saveBtn");
-  const profileNameInput = document.getElementById("profileName");
-
-  if (!appState.activeProfileName) {
-    form.reset();
-    profileNameInput.value = "";
-    if (header) header.textContent = "✨ Creating New Profile";
-    if (saveBtn) saveBtn.textContent = "💾 Save New Profile";
-  } else {
-    const data = appState.profiles[appState.activeProfileName];
-    profileNameInput.value = appState.activeProfileName;
-    if (header)
-      header.textContent = `✏️ Editing: ${appState.activeProfileName}`;
-    if (saveBtn) saveBtn.textContent = "💾 Update Profile";
-
-    appState.currentPhoto = data ? data.photo_base64 || "" : "";
-    appState.currentSig = data ? data.signature_base64 || "" : "";
-
+    const form = document.getElementById("jsonForm");
+    const header = document.getElementById("editorHeader");
+    const saveBtn = document.getElementById("saveBtn");
+    const profileNameInput = document.getElementById("profileName");
+    
     const pPreview = document.getElementById("photoPreview");
     const sPreview = document.getElementById("sigPreview");
+    const photoInput = document.getElementById("profilePhoto");
+    const sigInput = document.getElementById("profileSignature");
 
-    pPreview.src = appState.currentPhoto;
-    pPreview.style.display = appState.currentPhoto ? "block" : "none";
-    sPreview.src = appState.currentSig;
-    sPreview.style.display = appState.currentSig ? "block" : "none";
+    if (!appState.activeProfileName) {
+        // 1. BLANK PROFILE MODE
+        form.reset();
+        profileNameInput.value = "";
+        if (header) header.textContent = "✨ Creating New Profile";
+        if (saveBtn) saveBtn.textContent = "💾 Save New Profile";
 
-    document.getElementById("profilePhoto").value = "";
-    document.getElementById("profileSignature").value = "";
+        // ⚡ FIX: Clear the images from memory and hide the previews
+        appState.currentPhoto = "";
+        appState.currentSig = "";
+        
+        if (pPreview) { pPreview.src = ""; pPreview.style.display = "none"; }
+        if (sPreview) { sPreview.src = ""; sPreview.style.display = "none"; }
+        if (photoInput) photoInput.value = "";
+        if (sigInput) sigInput.value = "";
 
-    for (const key in data) {
-      const field = form.querySelector(`[name="${key}"]`);
-      if (field) {
-        if (field.type === "checkbox") {
-          field.checked = data[key] === "1";
-        } else {
-          field.value = data[key];
+    } else {
+        // 2. EDIT EXISTING PROFILE MODE
+        const data = appState.profiles[appState.activeProfileName];
+        profileNameInput.value = appState.activeProfileName;
+        if (header) header.textContent = `✏️ Editing: ${appState.activeProfileName}`;
+        if (saveBtn) saveBtn.textContent = "💾 Update Profile";
+
+        // Load existing images into memory and show previews
+        appState.currentPhoto = data ? data.photo_base64 || "" : "";
+        appState.currentSig = data ? data.signature_base64 || "" : "";
+
+        if (pPreview) {
+            pPreview.src = appState.currentPhoto;
+            pPreview.style.display = appState.currentPhoto ? "block" : "none";
         }
-        field.dispatchEvent(new Event("change"));
-      }
-    }
+        if (sPreview) {
+            sPreview.src = appState.currentSig;
+            sPreview.style.display = appState.currentSig ? "block" : "none";
+        }
+        
+        if (photoInput) photoInput.value = "";
+        if (sigInput) sigInput.value = "";
 
-    setTimeout(() => {
-      const dynamicFields = [
-        "present_upazila",
-        "gra_subject",
-        "mas_subject",
-        "ssc_group",
-        "hsc_group",
-        "ssc_board",
-        "hsc_board",
-      ];
-      dynamicFields.forEach((f) => {
-        const field = form.querySelector(`[name="${f}"]`);
-        if (field && data[f]) field.value = data[f];
-      });
-    }, 150);
-  }
+        // Fill all the text fields
+        for (const key in data) {
+            const field = form.querySelector(`[name="${key}"]`);
+            if (field) {
+                if (field.type === "checkbox") field.checked = data[key] === "1";
+                else field.value = data[key];
+                field.dispatchEvent(new Event("change"));
+            }
+        }
+
+        // Wait a tiny bit for the dynamic dropdowns (like Upazilas) to load, then fill them
+        setTimeout(() => {
+            const dynamicFields = [
+                "present_upazila", "gra_subject", "mas_subject", 
+                "ssc_group", "hsc_group", "ssc_board", "hsc_board"
+            ];
+            dynamicFields.forEach((f) => {
+                const field = form.querySelector(`[name="${f}"]`);
+                if (field && data[f]) field.value = data[f];
+            });
+        }, 150);
+    }
 }
 
 document.getElementById("jsonForm").addEventListener("input", () => {
