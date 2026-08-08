@@ -45,7 +45,10 @@
         "charset.json",
         "onnxruntime.min.js",
         "*.wasm",
-        "*.mjs"
+        "*.mjs",
+        "build/*",
+        "web/cmaps/*",
+        "web/standard_fonts/*"
       ],
       "matches": ["<all_urls>"]
     }

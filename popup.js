@@ -1,3 +1,9 @@
+// --- 1. IMPORT OFFICIAL PDF.JS ENGINE ---
+import * as pdfjsLib from './build/pdf.mjs';
+
+// Let PDF.js spawn its own worker automatically (Best practice for MV3)
+pdfjsLib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('build/pdf.worker.mjs');
+
 let districtData = {};
 let subjectData = {};
 
@@ -853,6 +859,113 @@ document.getElementById("injectBtn").addEventListener("click", async () => {
 
     window.close();
   });
+});
+
+// ==========================================
+// 📄 LOCAL PDF.JS EXTRACTION ENGINE (OFFICIAL)
+// ==========================================
+document.getElementById("pdfFileInput")?.addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const statusEl = document.getElementById("pdfLoadingStatus");
+    const pasteBox = document.getElementById("cvPasteBox");
+    
+    if (statusEl) {
+        statusEl.style.display = "block";
+        statusEl.textContent = "⏳ Reading Official PDF Engine...";
+        statusEl.style.color = "#2563eb"; 
+    }
+
+    try {
+        console.log(`📄 Processing: ${file.name} (${file.size} bytes)`);
+        
+        // 1. Convert file to binary array so PDF.js doesn't go blind
+        const arrayBuffer = await file.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+        
+// 2. The Final Diagnostic Configuration
+        const loadingTask = pdfjsLib.getDocument({
+            data: uint8Array, 
+            cMapUrl: chrome.runtime.getURL('web/cmaps/'),
+            cMapPacked: true,
+            standardFontDataUrl: chrome.runtime.getURL('web/standard_fonts/'),
+            useWorkerFetch: false,
+            disableWorker: true,      // ⚡ FORCE PARSING ON THE MAIN THREAD
+            disableFontFace: true     // ⚡ IGNORE FONT RENDERING
+            // Notice we removed isEvalSupported: false! Let's see if Chrome allows it.
+        });
+
+        const pdf = await loadingTask.promise;
+        console.log(`✅ PDF loaded successfully! Total Pages: ${pdf.numPages}`);
+        
+        let fullText = "";
+
+        // 3. Scan Pages & Extract Text
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            
+            console.log(`📊 Page ${pageNum}: Found ${textContent.items.length} items`);
+            const lines = {};
+
+            // 4. Group by precise Y-Coordinate (Row)
+            for (const item of textContent.items) {
+                if (!item.str || item.str.trim() === "") continue;
+                
+                let y = 0;
+                if (item.transform && item.transform.length >= 6) {
+                    y = Math.round(item.transform[5]);
+                } else if (item.y !== undefined) {
+                    y = Math.round(item.y);
+                }
+
+                if (!lines[y]) lines[y] = [];
+                lines[y].push(item);
+            }
+
+            // 5. Sort Rows Top to Bottom
+            const sortedY = Object.keys(lines).sort((a, b) => Number(b) - Number(a));
+
+            for (const y of sortedY) {
+                // 6. Sort Words Left to Right
+                lines[y].sort((a, b) => {
+                    const ax = (a.transform && a.transform.length >= 5) ? a.transform[4] : (a.x || 0);
+                    const bx = (b.transform && b.transform.length >= 5) ? b.transform[4] : (b.x || 0);
+                    return ax - bx;
+                });
+                
+                const lineStr = lines[y].map((item) => item.str).join(" ");
+                fullText += lineStr + "\n";
+            }
+        }
+
+        if (fullText.trim() === "") {
+            throw new Error("EMPTY_PDF");
+        }
+
+        // 7. Inject Flawless Text!
+        if (pasteBox) pasteBox.value = fullText;
+
+        if (statusEl) {
+            statusEl.textContent = `✅ Extraction Complete! Click 'Extract & Fill'.`;
+            statusEl.style.color = "#16a34a"; 
+        }
+        
+    } catch (err) {
+        console.error("❌ PDF Extraction Failed:", err);
+        
+        if (statusEl) {
+            if (err.message === "EMPTY_PDF") {
+                statusEl.textContent = "❌ No text found. PDF might be a scanned image.";
+            } else {
+                statusEl.textContent = "❌ Error reading PDF. Please check the console.";
+            }
+            statusEl.style.color = "#dc2626"; 
+        }
+    } finally {
+        event.target.value = ""; // Reset input so user can upload again
+    }
 });
 
 // ==========================================
